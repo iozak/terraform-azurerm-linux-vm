@@ -1,0 +1,28 @@
+# General
+env    = "###"
+role   = "###"
+region = "###"
+
+# Azure Subscription Details
+subscription_id = "###"
+
+# Network
+vnet_cidr = "###"
+snet_cidr = "###"
+
+# Virtual Machine
+vmsize = "###"
+
+# SSH
+admin_user     = "###"
+ssh_public_key = "###"
+
+# Rules
+allowip = [
+  "###",
+  "###",
+  "###",
+]
+
+# Email address for Alerts
+shutdown_alert_email = "###"
