@@ -1,13 +1,13 @@
 # --- Resource Group --- #
 resource "azurerm_resource_group" "ResourceGroup" {
-  name     = "${var.env}-rg-${var.role}"
+  name     = "${local.name_prefix}-rg"
   location = var.region
   tags     = local.common_tags
 }
 
 # --- Virtual Network --- #
 resource "azurerm_virtual_network" "VirtualNetwork" {
-  name                = "${var.env}-${var.role}-vnet"
+  name                = "${local.name_prefix}-vnet"
   resource_group_name = azurerm_resource_group.ResourceGroup.name
   location            = azurerm_resource_group.ResourceGroup.location
   address_space       = [var.vnet_cidr]
@@ -16,7 +16,7 @@ resource "azurerm_virtual_network" "VirtualNetwork" {
 
 # --- Subnet --- #
 resource "azurerm_subnet" "Subnet" {
-  name                 = "${var.env}-${var.role}-snet"
+  name                 = "${local.name_prefix}-snet"
   resource_group_name  = azurerm_resource_group.ResourceGroup.name
   virtual_network_name = azurerm_virtual_network.VirtualNetwork.name
   address_prefixes     = [var.snet_cidr]
@@ -24,15 +24,15 @@ resource "azurerm_subnet" "Subnet" {
 
 # --- Network Security Group --- #
 resource "azurerm_network_security_group" "NetworkSecurityGroup" {
-  name                = "${var.env}-${var.role}-nsg"
+  name                = "${local.name_prefix}-nsg"
   location            = azurerm_resource_group.ResourceGroup.location
   resource_group_name = azurerm_resource_group.ResourceGroup.name
   tags                = local.common_tags
 }
 
 # --- NSG Rules --- #
-resource "azurerm_network_security_rule" "NSGRule1" {
-  name                        = "${var.env}-${var.role}-nsg-rule1"
+resource "azurerm_network_security_rule" "nsg_rule_1" {
+  name                        = "${local.name_prefix}-nsg-rule1"
   priority                    = 100
   direction                   = "Inbound"
   access                      = "Allow"
@@ -53,7 +53,7 @@ resource "azurerm_subnet_network_security_group_association" "SecurityGroupAssoc
 
 # --- Public IP --- #
 resource "azurerm_public_ip" "PublicIP" {
-  name                = "${var.env}-${var.role}-pip"
+  name                = "${local.name_prefix}-pip"
   resource_group_name = azurerm_resource_group.ResourceGroup.name
   location            = azurerm_resource_group.ResourceGroup.location
   allocation_method   = "Static"
@@ -62,7 +62,7 @@ resource "azurerm_public_ip" "PublicIP" {
 
 # --- Network Interface (NIC)--- #
 resource "azurerm_network_interface" "NetworkInterface" {
-  name                = "${var.env}-app-${var.role}-nic"
+  name                = "${local.name_prefix}-nic"
   location            = azurerm_resource_group.ResourceGroup.location
   resource_group_name = azurerm_resource_group.ResourceGroup.name
 
@@ -77,7 +77,7 @@ resource "azurerm_network_interface" "NetworkInterface" {
 
 # --- Linux Virtual Machine --- #
 resource "azurerm_linux_virtual_machine" "LinuxVM" {
-  name                  = "${var.env}-app-${var.role}-01"
+  name                  = "${local.name_prefix}-vm-01"
   resource_group_name   = azurerm_resource_group.ResourceGroup.name
   location              = azurerm_resource_group.ResourceGroup.location
   size                  = var.vmsize
@@ -94,7 +94,7 @@ resource "azurerm_linux_virtual_machine" "LinuxVM" {
   }
 
   os_disk {
-    name                 = "${var.env}-app-${var.role}-01_OsDisk"
+    name                 = "${local.name_prefix}-vm-01_OsDisk"
     caching              = "ReadWrite"
     storage_account_type = "StandardSSD_LRS"
   }
